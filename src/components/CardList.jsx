@@ -1,8 +1,9 @@
 import {useEffect, useState} from "react";
 import {Mtg} from "../api/mtg.js";
 
-function CardList() {
+function CardList({ onSelectCard }) {
     const [cards, setCards] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
     useEffect(() => {
         const mtg = new Mtg();
         mtg.loadCards()
@@ -10,10 +11,26 @@ function CardList() {
                 setCards(loadedCards)
             });
     }, []);
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
+    };
+    const filteredCards = cards.filter(card =>
+        card.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
    return <div id="menu">
         <h2>Cards</h2>
+        <input
+                type="text"
+                placeholder="Search cards..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+            />
         <div id="listContainer">
-            {cards.map(card => <li key={card.id}>{card.name}</li>)}
+        {filteredCards.map(card => (
+                    <li key={card.id} onClick={() => onSelectCard(card)}>
+                        {card.name}
+                    </li>
+                ))}
         </div>
     </div>
 }
